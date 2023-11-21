@@ -52,6 +52,7 @@ magic_fx.set_volume(0.75)
 
 #load background image
 bg_image = pygame.image.load("assets/images/background/background.jpg").convert_alpha()
+bgS_image = pygame.image.load("assets/images/background/backgroundSobre.jpg").convert_alpha()
 
 #load spritesheets
 warrior_sheet = pygame.image.load("assets/images/warrior/Sprites/warrior.png").convert_alpha()
@@ -81,6 +82,7 @@ def draw_text(text, font, text_col, x, y):
 def draw_bg():
   scaled_bg = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
   screen.blit(scaled_bg, (0, 0))
+
 
 #function for drawing fighter health bars
 def draw_health_bar(health, x, y):
@@ -136,6 +138,10 @@ while run:
   #draw fighters
   fighter_1.draw(screen)
   fighter_2.draw(screen)
+
+  
+  scaled_bgS = pygame.transform.scale(bgS_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+  screen.blit(scaled_bgS, (0, 0))
 
   #check for player defeat
   if round_over == False:
