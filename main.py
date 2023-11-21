@@ -21,6 +21,7 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
 
 
 #define game variables
@@ -59,7 +60,7 @@ wizard_sheet = pygame.image.load("assets/images/wizard/Sprites/wizard.png").conv
 #load vicory image
 Fight_img = pygame.image.load("assets/images/icons/fight.png").convert_alpha()
 Round2_img = pygame.image.load("assets/images/icons/round2.png").convert_alpha()
-victoryWizzard_img = pygame.image.load("assets/images/icons/wizzarwin.png").convert_alpha()
+victoryWizzard_img = pygame.image.load("assets/images/icons/wizzardwin.png").convert_alpha()
 victoryWarrior_img = pygame.image.load("assets/images/icons/warriorwin.png").convert_alpha()
 
 
@@ -89,6 +90,9 @@ def draw_health_bar(health, x, y):
   pygame.draw.rect(screen, RED, (x, y, 400, 10))
   pygame.draw.rect(screen, YELLOW, (x, y, 400 * ratio, 10))
 
+def resize_image(image, width, height):
+    return pygame.transform.scale(image, (width, height))
+
 
 #create two instances of fighters
 fighter_1 = Fighter(1, 200, 369, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
@@ -108,6 +112,9 @@ while run:
   draw_health_bar(fighter_2.health, 580, 40)
   draw_text(str(score[0]), score_font, WHITE, 20, 5)
   draw_text(str(score[1]), score_font, WHITE, 970, 5)
+  draw_text("Bozo", score_font, YELLOW, 20, 50)
+  draw_text("Naro", score_font, GREEN, 80, 50)
+  draw_text("Nove Dedos", score_font, RED, 840, 50)
 
   #update countdown
   if intro_count <= 0:
@@ -142,10 +149,12 @@ while run:
       round_over_time = pygame.time.get_ticks()
   else:
     #display victory image
-    if fighter_1.alive == True:
-      screen.blit(victoryWarrior_img, (0, 20))
-    elif fighter_2.alive == True:
-      screen.blit(victoryWizzard_img, (0, 20))
+    if fighter_1.alive:
+        resized_image = resize_image(victoryWarrior_img, SCREEN_WIDTH, SCREEN_HEIGHT)
+        screen.blit(resized_image, (0, 0))
+    elif fighter_2.alive:
+        resized_image = resize_image(victoryWizzard_img, SCREEN_WIDTH, SCREEN_HEIGHT)
+        screen.blit(resized_image, (0, 0))
     if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
       round_over = False
       intro_count = 3
