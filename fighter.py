@@ -8,7 +8,7 @@ class Fighter():
     self.offset = data[2]
     self.flip = flip
     self.animation_list = self.load_images(sprite_sheet, animation_steps)
-    self.action = 0#0:idle #1:run #2:jump #3:attack1 #4: attack2 #5:hit #6:death
+    self.action = 0 #0:ocioso #1:corrida #2:salto #3:ataque1 #4:ataque2 #5:hit #6:morte
     self.frame_index = 0
     self.image = self.animation_list[self.action][self.frame_index]
     self.update_time = pygame.time.get_ticks()
@@ -26,7 +26,7 @@ class Fighter():
 
 
   def load_images(self, sprite_sheet, animation_steps):
-    #extract images from spritesheet
+    #extrair imagens de spritesheet
     animation_list = []
     for y, animation in enumerate(animation_steps):
       temp_img_list = []
@@ -45,62 +45,64 @@ class Fighter():
     self.running = False
     self.attack_type = 0
 
-    #get keypresses
+    #pressionamentos de teclas
     key = pygame.key.get_pressed()
 
-    #can only perform other actions if not currently attacking
+    #executar outras acoes se nao estiver atacando no momento
     if self.attacking == False and self.alive == True and round_over == False:
-      #check player 1 controls
+      #controles do player 1
       if self.player == 1:
-        #movement
+        #movimento
         if key[pygame.K_a]:
           dx = -SPEED
           self.running = True
         if key[pygame.K_d]:
           dx = SPEED
           self.running = True
-        #jump
+        #pulo
         if key[pygame.K_w] and self.jump == False:
           self.vel_y = -30
           self.jump = True
-        #attack
+        #ataque
         if key[pygame.K_r] or key[pygame.K_t]:
           self.attack(target)
-          #determine which attack type was used
+          #determinando qual ataque sera utilizado
+          #tecla de letra R ou T
           if key[pygame.K_r]:
             self.attack_type = 1
           if key[pygame.K_t]:
             self.attack_type = 2
 
 
-      #check player 2 controls
+      #controles do player 2
       if self.player == 2:
-        #movement
+        #movimento
         if key[pygame.K_LEFT]:
           dx = -SPEED
           self.running = True
         if key[pygame.K_RIGHT]:
           dx = SPEED
           self.running = True
-        #jump
+        #pulo
         if key[pygame.K_UP] and self.jump == False:
           self.vel_y = -30
           self.jump = True
-        #attack
+        #ataque
         if key[pygame.K_KP1] or key[pygame.K_KP2]:
           self.attack(target)
-          #determine which attack type was used
+          #determinando qual ataque sera utilizado
+          #tecla de numero 1 ou 2
           if key[pygame.K_KP1]:
             self.attack_type = 1
           if key[pygame.K_KP2]:
             self.attack_type = 2
 
 
-    #apply gravity
+    #aplicando gravidade
     self.vel_y += GRAVITY
     dy += self.vel_y
 
-    #ensure player stays on screen
+    #garantir que o jogador permaneca na tela
     if self.rect.left + dx < 0:
       dx = -self.rect.left
     if self.rect.right + dx > screen_width:
@@ -110,71 +112,71 @@ class Fighter():
       self.jump = False
       dy = screen_height - 50 - self.rect.bottom
 
-    #ensure players face each other
+    #garantir que os jogadores se enfrentem
     if target.rect.centerx > self.rect.centerx:
       self.flip = False
     else:
       self.flip = True
 
-    #apply attack cooldown
+    #aplicar attack cooldown
     if self.attack_cooldown > 0:
       self.attack_cooldown -= 1
 
-    #update player position
+    #atualizar a posicao do jogador
     self.rect.x += dx
     self.rect.y += dy
 
 
-  #handle animation updates
+  #manipular atualizacoes de animacao
   def update(self):
-    #check what action the player is performing
+    #verificar qual acao o jogador esta realizando
     if self.health <= 0:
       self.health = 0
       self.alive = False
-      self.update_action(6)#6:death
+      self.update_action(6) #6:morte
     elif self.hit == True:
-      self.update_action(5)#5:hit
+      self.update_action(5) #5:hit
     elif self.attacking == True:
       if self.attack_type == 1:
-        self.update_action(3)#3:attack1
+        self.update_action(3) #3:ataque1
       elif self.attack_type == 2:
-        self.update_action(4)#4:attack2
+        self.update_action(4) #4:ataque2
     elif self.jump == True:
-      self.update_action(2)#2:jump
+      self.update_action(2) #2:pular
     elif self.running == True:
-      self.update_action(1)#1:run
+      self.update_action(1) #1:correr
     else:
-      self.update_action(0)#0:idle
+      self.update_action(0) #0:ocioso
 
     animation_cooldown = 50
-    #update image
+    #atualizar imagem
     self.image = self.animation_list[self.action][self.frame_index]
-    #check if enough time has passed since the last update
+    #checar se ja passou tempo suficiente desde a ultima atualizacao
     if pygame.time.get_ticks() - self.update_time > animation_cooldown:
       self.frame_index += 1
       self.update_time = pygame.time.get_ticks()
-    #check if the animation has finished
+    #checar se a animacao terminou
     if self.frame_index >= len(self.animation_list[self.action]):
-      #if the player is dead then end the animation
+      #se o jogador estiver morto, termine a animacao
       if self.alive == False:
         self.frame_index = len(self.animation_list[self.action]) - 1
       else:
         self.frame_index = 0
-        #check if an attack was executed
+        #checar se um ataque foi executado
         if self.action == 3 or self.action == 4:
           self.attacking = False
           self.attack_cooldown = 20
-        #check if damage was taken
+        #checar se houve danos
         if self.action == 5:
           self.hit = False
-          #if the player was in the middle of an attack, then the attack is stopped
+          #se o jogador estava no meio de um ataque, entao o ataque eh interrompido
           self.attacking = False
           self.attack_cooldown = 20
 
 
   def attack(self, target):
     if self.attack_cooldown == 0:
-      #execute attack
+      #executa o ataque
       self.attacking = True
       self.attack_sound.play()
       attacking_rect = pygame.Rect(self.rect.centerx - (2 * self.rect.width * self.flip), self.rect.y, 2 * self.rect.width, self.rect.height)
@@ -184,10 +186,10 @@ class Fighter():
 
 
   def update_action(self, new_action):
-    #check if the new action is different to the previous one
+    #checar se a nova acao eh diferente da anterior
     if new_action != self.action:
       self.action = new_action
-      #update the animation settings
+      #atualizar as confuguracoes de animacao
       self.frame_index = 0
       self.update_time = pygame.time.get_ticks()
 
